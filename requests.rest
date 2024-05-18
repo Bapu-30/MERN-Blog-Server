@@ -1,0 +1,9 @@
+
+
+GET http://localhost:3000/new-notification
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MGI5YjNjYjFjYWVhZDhmMjU3MTU0NyIsImlhdCI6MTcxNjAwODQ1NH0.bEkKWHvYHbf8iG_yuFv3d9u94mTNPIVILYXSV8iFqAI
+
+
+
+
