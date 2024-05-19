@@ -735,6 +735,7 @@ const deleteComments = (_id) => {
 
 }
 
+// delete comment route
 server.post("/delete-comment", verifyJwt, (req, res) => {
     let user_id = req.user;
     let { _id } = req.body;
@@ -753,6 +754,7 @@ server.post("/delete-comment", verifyJwt, (req, res) => {
         })
 })
 
+// new notification route.(checks if there is any unread notification available)
 server.get("/new-notification", verifyJwt, (req, res) => {
     let user_id = req.user;
 
