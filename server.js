@@ -723,7 +723,7 @@ const deleteComments = (_id) => {
             Blog.findOneAndUpdate({ _id: comment.blog_id }, { $pull: { comments: _id }, $inc: { "activity.total_comments": -1 }, "activity.total_parent_comments": comment.parent ? 0 : -1 })
                 .then(blog => {
                     if (comment.children.length) {
-                        comment.children.map(replies => {s
+                        comment.children.map(replies => {
                             deleteComments(replies)
                         })
                     }
