@@ -642,10 +642,10 @@ server.post("/add-comment", verifyJwt, (req, res) => {
                     .then(replyingToCommentDoc => {
                         notificationObj.notification_for = replyingToCommentDoc.commented_by;
                     })
-                    
-                if(notification_id){
-                    Notification.findOneAndUpdate({_id : notification_id}, {reply : commentFile._id})
-                    .then(notification => console.log('Notification Updated'))
+
+                if (notification_id) {
+                    Notification.findOneAndUpdate({ _id: notification_id }, { reply: commentFile._id })
+                        .then(notification => console.log('Notification Updated'))
                 }
 
             }
@@ -710,6 +710,7 @@ server.post("/get-replies", (req, res) => {
 const deleteComments = (_id) => {
     Comment.findOneAndDelete({ _id })
         .then(comment => {
+
             if (comment.parent) {
                 Comment.findOneAndUpdate({ _id: comment.parent }, { $pull: { children: _id } })
                     .then(data => {
@@ -722,7 +723,8 @@ const deleteComments = (_id) => {
 
             Notification.findOneAndDelete({ comment: _id })
                 .then(notification => console.log('Comment notification deleted'))
-            Notification.findOneAndDelete({ reply: _id })
+
+            Notification.findOneAndUpdate({ reply: _id }, { $unset: { reply: 1 } })
                 .then(notification => console.log('Reply notification deleted'))
 
             Blog.findOneAndUpdate({ _id: comment.blog_id }, { $pull: { comments: _id }, $inc: { "activity.total_comments": -1 }, "activity.total_parent_comments": comment.parent ? 0 : -1 })
@@ -747,6 +749,10 @@ server.post("/delete-comment", verifyJwt, (req, res) => {
 
     Comment.findOne({ _id })
         .then(comment => {
+            console.log("User_id = ", user_id);
+            console.log("_id = ", _id);
+            console.log("blog Author= ", comment.blog_author);
+            console.log("commented by = ", comment.commented_by);
             if (user_id == comment.commented_by || user_id == comment.blog_author) {
 
                 deleteComments(_id)
@@ -757,7 +763,7 @@ server.post("/delete-comment", verifyJwt, (req, res) => {
                 return res.status(403).json({ error: "You can not delete this comment" })
             }
         })
-        
+
 })
 
 // new notification route.(checks if there is any unread notification available)
