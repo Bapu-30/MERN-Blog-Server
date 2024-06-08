@@ -816,9 +816,9 @@ server.post("/notifications", verifyJwt, (req, res) => {
         .then(notifications => {
 
             Notification.updateMany(findQuery, { seen: true })
-            .skip(skipDocs)
-            .limit(maxLimit)
-            .then(() => console.log("notifiaction seen"))
+                .skip(skipDocs)
+                .limit(maxLimit)
+                .then(() => console.log("notifiaction seen"))
             return res.status(200).json({ notifications })
         })
         .catch(err => {
@@ -851,9 +851,46 @@ server.post("/all-notifications-count", verifyJwt, (req, res) => {
 
 })
 
+server.post("/user-written-blogs", verifyJwt, (req, res) => {
+    let user_id = req.user;
 
+    let { page, draft, query, deletedDocCount } = req.body
 
+    let maxLimit = 2;
+    let skipDocs = (page - 1) * maxLimit;
 
+    if (deletedDocCount) {
+        skipDocs -= deletedDocCount;
+    }
+
+    Blog.find({ author: user_id, draft, title: new RegExp(query, 'i') })
+        .skip(skipDocs)
+        .limit(maxLimit)
+        .sort({ publishedAt: -1 })
+        .select(" title banner publishedAt blog_id activity description draft -_id ")
+        .then(blogs => {
+            console.log(blogs);
+            return res.status(200).json({ blogs })
+        })
+        .catch(err => {
+            return res.status(500).json({ error: err.message })
+        })
+})
+
+server.post("/user-written-blogs-count", verifyJwt, (req, res) => {
+    let user_id = req.user;
+
+    let { draft, query } = req.body;
+
+    Blog.countDocuments({ author: user_id, draft, title: new RegExp(query, 'i') })
+        .then(count => {
+            console.log(count);
+            return res.status(200).json({ totalDocs: count })
+        })
+        .catch(err => {
+            return res.status(500).json({ error: err.message })
+        })
+})
 
 server.listen(PORT, () => {
     console.log("Listening on port ->", PORT);
